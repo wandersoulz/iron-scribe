@@ -38,7 +38,7 @@ export const login = async (email: string, password: string): Promise<AuthUser> 
         console.log("🛠️ Using Dummy Auth (Dev mode or missing keys)");
         // Simulate network delay
         await new Promise(r => setTimeout(r, 500));
-        return { id: 'root-user-123', email: email };
+        return { id: '00000000-0000-0000-0000-000000000000', email: email };
     }
 
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });

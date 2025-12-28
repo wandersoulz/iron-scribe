@@ -23,15 +23,16 @@ services:
     name: iron-scribe-client
     runtime: static
     rootDir: .
-    buildCommand: npm install && npx expo export -p web --output-dir dist --source-maps=false 
-    staticPublishPath: ./dist
+    buildCommand: npm install && npm run build --workspace=@iron-scribe/client
+    staticPublishPath: ./apps/client/dist
     
     # ⚡ THE MAGIC: REWRITE RULES ⚡
     # This tells Render: "If a user hits /api/..., send them to the API service"
     routes:
       - type: rewrite
         source: /api/*
-        destination: https://iron-scribe-api.onrender.com/* - type: rewrite
+        destination: https://iron-scribe-api.onrender.com/*
+      - type: rewrite
         source: /*
         destination: /index.html
 

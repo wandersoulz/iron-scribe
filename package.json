@@ -15,5 +15,9 @@
     "client:android": "npx --workspace apps/client expo start --android",
     "client:web": "npx --workspace apps/client expo start --web",
     "ingest": "python ingest_hero.py"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.2"
   }
 }

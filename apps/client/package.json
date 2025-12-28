@@ -4,6 +4,7 @@
   "main": "src/index.ts",
   "scripts": {
     "start": "expo start",
+    "build": "expo export -p web --output-dir dist --source-maps=false",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web"

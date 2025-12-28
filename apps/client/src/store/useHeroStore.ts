@@ -1,5 +1,18 @@
 import { create } from 'zustand';
 import { Hero, HeroState } from '@iron-scribe/common';
+import { supabase } from '../lib/auth';
+import { usePlayerStore } from './usePlayerStore';
+
+const API_URL = process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000';
+
+// Helper to get token
+const getAuthToken = async (): Promise<string | null> => {
+  const { userId } = usePlayerStore.getState();
+  if (userId === '00000000-0000-0000-0000-000000000000') return 'dev-token-root-user';
+  
+  const { data } = await supabase.auth.getSession();
+  return data.session?.access_token || null;
+};
 
 // Helper interface for the list view
 interface HeroSummary {
@@ -30,11 +43,18 @@ export const useHeroStore = create<HeroStore>((set, get) => ({
   isLoading: false,
   error: null,
 
-  fetchHeroes: async (userId) => {
+  fetchHeroes: async () => {
     set({ isLoading: true, error: null });
     try {
+      const token = await getAuthToken();
       // Ensure you are using your machine's local IP, not localhost
-      const response = await fetch(`http://YOUR_IP:3000/heroes/player/${userId}`);
+      const response = await fetch(`${API_URL}/heroes/player`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (response.status === 401) throw new Error('Unauthorized');
       if (!response.ok) throw new Error('Failed to fetch heroes');
       
       const data = await response.json();
@@ -48,7 +68,14 @@ export const useHeroStore = create<HeroStore>((set, get) => ({
   fetchActiveHero: async (heroId) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await fetch(`http://YOUR_IP:3000/heroes/${heroId}/full`);
+      const token = await getAuthToken();
+      const response = await fetch(`${API_URL}/heroes/${heroId}/full`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (response.status === 401) throw new Error('Unauthorized');
+      
       const data = await response.json();
       set({ activeHero: data, isLoading: false });
     } catch (err: any) {
@@ -73,9 +100,13 @@ export const useHeroStore = create<HeroStore>((set, get) => ({
 
     // 3. Sync to Postgres/Apache AGE
     try {
-      await fetch(`http://YOUR_IP:3000/heroes/${activeHero.id}/state`, {
+      const token = await getAuthToken();
+      await fetch(`${API_URL}/heroes/${activeHero.id}/state`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify(updatedState),
       });
     } catch (error) {
@@ -93,9 +124,13 @@ export const useHeroStore = create<HeroStore>((set, get) => ({
 
     // 2. Sync to DB
     try {
-      await fetch(`http://YOUR_IP:3000/heroes/${activeHero.id}/state`, {
+      const token = await getAuthToken();
+      await fetch(`${API_URL}/heroes/${activeHero.id}/state`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify(newState),
       });
     } catch (error) {
