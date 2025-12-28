@@ -1,0 +1,40 @@
+services:
+  # 1. THE DATABASE (Managed by you via Docker, or use Supabase external URL)
+  # If using Supabase, you can delete this section entirely!
+
+  # 2. THE API (Express)
+  - type: web
+    name: iron-scribe-api
+    runtime: node
+    plan: free
+    rootDir: .
+    buildCommand: npm install && npm run build --workspace=packages/api
+    startCommand: npm run start:prod --workspace=packages/api
+    envVars:
+      - key: DATABASE_URL
+        sync: false # You will paste your Supabase URL here in the dashboard
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+
+  # 3. THE WEB CLIENT (Expo Web)
+  - type: web
+    name: iron-scribe-client
+    runtime: static
+    rootDir: .
+    buildCommand: npm install && npx expo export -p web --output-dir dist --source-maps=false 
+    staticPublishPath: ./dist
+    
+    # ⚡ THE MAGIC: REWRITE RULES ⚡
+    # This tells Render: "If a user hits /api/..., send them to the API service"
+    routes:
+      - type: rewrite
+        source: /api/*
+        destination: https://iron-scribe-api.onrender.com/* - type: rewrite
+        source: /*
+        destination: /index.html
+
+    envVars:
+      - key: NODE_ENV
+        value: production

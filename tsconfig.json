@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "jsx": "react-native",
+    "target": "ESNext",
+    "module": "commonjs",
+    "lib": ["ESNext"],
+    "declaration": true,
+    "strict": true,
+    "noImplicitAny": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "node",
+    "baseUrl": ".",
+    "paths": {
+      "@iron-scribe/common": ["packages/common/index.ts"]
+    }
+  },
+  "exclude": ["node_modules"]
+}

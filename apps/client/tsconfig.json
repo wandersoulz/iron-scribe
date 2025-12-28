@@ -1,0 +1,10 @@
+{
+  "extends": ["../../tsconfig.json", "expo/tsconfig.base"],
+  "compilerOptions": {
+    "outDir": "./dist",
+    "module": "esnext",
+    "target": "esnext",
+    "moduleResolution": "bundler"
+  },
+  "include": ["**/*.ts", "metro.config.js"]
+}

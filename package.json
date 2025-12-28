@@ -1,0 +1,19 @@
+{
+  "name": "iron-scribe",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Root workspace for DrawSteel Companion App",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "api": "ts-node --project packages/api/tsconfig.json packages/api/app.ts",
+    "clent": "npx --workspace apps/client expo start",
+    "db:up": "docker-compose up -d",
+    "db:down": "docker-compose down",
+    "client:android": "npx --workspace apps/client expo start --android",
+    "client:web": "npx --workspace apps/client expo start --web",
+    "ingest": "python ingest_hero.py"
+  }
+}
