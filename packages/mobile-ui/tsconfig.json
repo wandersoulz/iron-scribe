@@ -1,0 +1,19 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "noEmit": true,
+    "baseUrl": ".",
+    "composite": true,
+    "paths": {
+      "@iron-scribe/model": ["../model/src/index.ts"],
+      "@iron-scribe/data": ["../data/src/index.ts"],
+      "@iron-scribe/ui-shared": ["../ui-shared/src/index.ts"]
+    }
+  },
+  "references": [
+    { "path": "../model" },
+    { "path": "../data" },
+    { "path": "../ui-shared" }
+  ]
+}

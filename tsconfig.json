@@ -1,15 +1,10 @@
 {
-  "compilerOptions": {
-    "jsx": "react",
-    "target": "ES2022",
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "isolatedModules": true,
-    "noEmit": true
-  },
-  "include": ["src/**/*.ts", "src/**/*.tsx"]
+  "files": [],
+  "references": [
+    { "path": "./packages/model" },
+    { "path": "./packages/data" },
+    { "path": "./packages/ui-shared" },
+    { "path": "./packages/web-ui" },
+    { "path": "./packages/mobile-ui" }
+  ]
 }

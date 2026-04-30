@@ -1,0 +1,81 @@
+import { Domain } from "@iron-scribe/model";
+
+export const DOMAINS: Domain[] = [
+  {
+    id: "domain_creation",
+    name: "Creation",
+    type: "domain",
+    description: "",
+    skillGroupId: "Crafting",
+  },
+  {
+    id: "domain_death",
+    name: "Death",
+    type: "domain",
+    description: "",
+    skillGroupId: "Lore",
+  },
+  {
+    id: "domain_date",
+    name: "Fate",
+    type: "domain",
+    description: "",
+    skillGroupId: "Lore",
+  },
+  {
+    id: "domain_knowledge",
+    name: "Knowledge",
+    type: "domain",
+    description: "",
+    skillGroupId: "Lore",
+  },
+  {
+    id: "domain_life",
+    name: "Life",
+    type: "domain",
+    description: "",
+    skillGroupId: "Exploration",
+  },
+  {
+    id: "domain_love",
+    name: "Love",
+    type: "domain",
+    description: "",
+    skillGroupId: "Interpersonal",
+  },
+  {
+    id: "domain_nature",
+    name: "Nature",
+    type: "domain",
+    description: "",
+    skillGroupId: "Exploration",
+  },
+  {
+    id: "domain_storm",
+    name: "Storm",
+    type: "domain",
+    description: "",
+    skillGroupId: "Exploration",
+  },
+  {
+    id: "domain_sun",
+    name: "Sun",
+    type: "domain",
+    description: "",
+    skillGroupId: "Lore",
+  },
+  {
+    id: "domain_trickery",
+    name: "Trickery",
+    type: "domain",
+    description: "",
+    skillGroupId: "Intrigue",
+  },
+  {
+    id: "domain_war",
+    name: "War",
+    type: "domain",
+    description: "",
+    skillGroupId: "Exploration",
+  },
+] as any;

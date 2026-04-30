@@ -1,0 +1,15 @@
+export enum MovementType {
+    Slide = "slide",
+    Push = "push",
+    Teleport = "teleport",
+    Pull = "pull",
+    Walk = "walk",
+    Burrow = "burrow",
+    Dig = "dig",
+    Climb = "climb",
+    Swim = "swim",
+    Jump = "jump",
+    Crawl = "crawl",
+    Fly = "fly",
+    Hover = "hover",
+}
