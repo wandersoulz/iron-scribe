@@ -118,70 +118,85 @@ export class ClassBuilder {
     ];
 
     // Subclass choices
-    const subclassChoices: FeatureChoice[] = (def.subclasses || []).map((sc) => {
-      const subclassSelection = selections.find((s) => s.choiceId === sc.id);
+    const subclassChoices: FeatureChoice[] = (def.subclasses || []).map(
+      (sc) => {
+        const subclassSelection = selections.find((s) => s.choiceId === sc.id);
 
-      return plainToInstance(FeatureChoice, {
-        id: sc.id,
-        name: sc.name,
-        type: "feature-choice",
-        count: 1,
-        values: {
-          id: `values_${sc.id}`,
-          type: "static",
-          contents: sc.options
-            .filter((opt) => {
-              if (!subclassSelection) return true;
-              return subclassSelection.selectedOptionId === opt.id;
-            })
-            .map((opt) => {
-              const optFeature: ClassFeature = plainToInstance(ClassFeature, {
-                ...opt,
-                choices: opt.choices || [],
-                features: opt.features || [],
-              });
+        return plainToInstance(FeatureChoice, {
+          id: sc.id,
+          name: sc.name,
+          type: "feature-choice",
+          count: 1,
+          values: {
+            id: `values_${sc.id}`,
+            type: "static",
+            contents: sc.options
+              .filter((opt) => {
+                if (!subclassSelection) return true;
+                return subclassSelection.selectedOptionId === opt.id;
+              })
+              .map((opt) => {
+                const optFeature: ClassFeature = plainToInstance(ClassFeature, {
+                  ...opt,
+                  choices: opt.choices || [],
+                  features: opt.features || [],
+                });
 
-              if (opt.levelFeatures) {
-                opt.levelFeatures.forEach((lf) => {
-                  optFeature.features?.push(
-                    plainToInstance(ClassFeature, {
-                      id: `feat_${opt.id}_level_${lf.level}`,
-                      name: `${opt.name} Level ${lf.level} Features`,
-                      description: `Features gained at level ${lf.level}.`,
-                      level: lf.level,
-                      features: lf.features,
-                      abilities: lf.abilities,
-                      choices: lf.choices,
+                if (opt.levelFeatures) {
+                  opt.levelFeatures.forEach((lf) => {
+                    optFeature.features?.push(
+                      plainToInstance(ClassFeature, {
+                        id: `feat_${opt.id}_level_${lf.level}`,
+                        name: `${opt.name} Level ${lf.level} Features`,
+                        description: `Features gained at level ${lf.level}.`,
+                        level: lf.level,
+                        features: lf.features,
+                        abilities: lf.abilities,
+                        choices: lf.choices,
+                      }),
+                    );
+                  });
+                }
+
+                if (opt.skillGroupId) {
+                  optFeature.modifiers = [
+                    plainToInstance(Modifier, {
+                      modifierType: "list",
+                      target: "skills",
+                      operation: "add",
+                      value: {
+                        choiceReferenceValue: {
+                          choiceId: `choice_${opt.id}_skill`,
+                        },
+                      },
+                    } as Modifier),
+                  ];
+
+                  optFeature.choices?.push(
+                    plainToInstance(FeatureChoice, {
+                      id: `choice_${opt.id}_skill`,
+                      name: `Select a ${opt.skillGroupId} skill`,
+                      type: "feature-choice",
+                      count: 1,
+                      values: {
+                        id: `values_${opt.id}_skill`,
+                        type: "registry",
+                        registryName: RegistryName.Skills,
+                      },
+                      filter: {
+                        type: "eq",
+                        field: "skillGroupId",
+                        value: opt.skillGroupId,
+                      },
                     }),
                   );
-                });
-              }
-
-              if (opt.skillGroupId) {
-                optFeature.choices?.push(
-                  plainToInstance(FeatureChoice, {
-                    id: `choice_${opt.id}_skill`,
-                    name: `Select a ${opt.skillGroupId} skill`,
-                    type: "feature-choice",
-                    count: 1,
-                    values: {
-                      id: `values_${opt.id}_skill`,
-                      type: "registry",
-                      registryName: RegistryName.Skills,
-                    },
-                    filter: {
-                      type: "eq",
-                      field: "skillGroupId",
-                      value: opt.skillGroupId,
-                    },
-                  }),
-                );
-              }
-              return optFeature;
-            }),
-        },
-      });
-    }) as FeatureChoice[];
+                }
+                return optFeature;
+              }),
+          },
+        });
+      },
+    ) as FeatureChoice[];
 
     const classInstance = plainToInstance(Class, def);
     classInstance.modifiers = classModifiers as Modifier[];

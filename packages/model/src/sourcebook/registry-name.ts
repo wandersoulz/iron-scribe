@@ -6,5 +6,7 @@ export enum RegistryName {
   Abilities = "abilities",
   Classes = "classes",
   ClassFeatures = "class-features",
+  Careers = "careers",
+  Perks = "perks",
   Damage = "damage",
 }

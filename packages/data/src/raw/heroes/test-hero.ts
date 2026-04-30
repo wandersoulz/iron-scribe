@@ -40,6 +40,18 @@ export const TestHero: HeroReference = {
       choiceId: "choice_censor_ability_sig",
       selectedOptionId: "feat_ability_ability_censor_holy_strike",
     },
+    {
+      choiceId: "choice-laborer-inciting-incident",
+      selectedOptionId: "laborer-ii-2",
+    },
+    {
+      choiceId: "choice-laborer-skill-1",
+      selectedOptionId: "skill-exploration-climb",
+    },
+    {
+      choiceId: "choice-laborer-skill-2",
+      selectedOptionId: "skill-crafting-blacksmithing",
+    },
   ],
   modules: {
     ancestry: {
@@ -53,6 +65,9 @@ export const TestHero: HeroReference = {
     },
     class: {
       classId: "censor",
+    },
+    career: {
+      careerId: "career-laborer",
     },
   },
   heroCombatState: {

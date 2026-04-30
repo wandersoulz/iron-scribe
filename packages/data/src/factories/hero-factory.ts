@@ -1,6 +1,7 @@
 import { Hero, HeroReference, Library, BaseFeature } from "@iron-scribe/model";
 import { AncestryFactory } from "./ancestry-factory";
 import { ClassFactory } from "./class-factory";
+import { CareerFactory } from "./career-factory";
 import { HERO_DEFAULTS } from "../raw/rules/default-values";
 
 export type ComponentFactory<
@@ -21,6 +22,8 @@ export const ComponentBuilder: {
     AncestryFactory.create(reference, library, heroReference),
   class: (reference, library, heroReference) =>
     ClassFactory.create(reference, library, heroReference),
+  career: (reference, library, heroReference) =>
+    CareerFactory.create(reference, library, heroReference),
 };
 
 export class HeroFactory {

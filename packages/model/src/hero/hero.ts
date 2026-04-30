@@ -1,5 +1,6 @@
 import { Ancestry } from "../ancestry/ancestry";
 import { Class } from "../class/class";
+import { Career } from "../career/career";
 import { StatValueResolver } from "../modifiers/stat-value-resolver";
 import { HeroReference } from "./hero-reference";
 import {
@@ -56,6 +57,10 @@ export class Hero extends StatValueResolver {
 
   public get class(): Class | undefined {
     return this.resolvedComponents.find((c) => c.type === "class") as Class;
+  }
+
+  public get career(): Career | undefined {
+    return this.resolvedComponents.find((c) => c.type === "career") as Career;
   }
 
   public getStringStat(statName: string): string {
@@ -152,7 +157,7 @@ export class Hero extends StatValueResolver {
     const results = relevantModifiers
       .filter((mod) => mod.operation === "add")
       .map((mod) => mod.value)
-      .filter((feat) => feat != null);
+      .filter((feat) => feat != null) as (string | number | BaseFeature)[];
 
     this.listCache.set(listName, results);
     return results;
@@ -167,7 +172,6 @@ export class Hero extends StatValueResolver {
   public resolveChoiceReference(
     choiceReference: FeatureChoiceReference,
   ): BaseFeature | null {
-    // 1. Try to find the choice in the registry first (fast path)
     const foundChoice = this.featureRegistry
       .getAllChoices()
       .find(
@@ -182,42 +186,6 @@ export class Hero extends StatValueResolver {
       }
     }
 
-    // 2. Fallback to recursive search if not found in registry (might happen during initial resolution)
-    let searchedChoice: FeatureChoice | null = null;
-    const traverse = (f: BaseFeature) => {
-      if (!f || searchedChoice) return;
-
-      if (f.choices) {
-        const choice = f.choices.find((c) => c.id === choiceReference.choiceId);
-        if (choice) {
-          searchedChoice = choice;
-          return;
-        }
-      }
-
-      if (f.features) f.features.forEach(traverse);
-
-      if (f.choices) {
-        f.choices.forEach((choice) => {
-          const selection = (this.reference.selections || []).find(
-            (s) => s.choiceId === choice.id,
-          );
-          if (selection) {
-            const selected = choice.getSelectionValue(selection, this);
-            if (selected) traverse(selected);
-          }
-        });
-      }
-    };
-
-    this.components.forEach(traverse);
-
-    if (!searchedChoice) return null;
-
-    const selection = (this.reference.selections || []).find(
-      (selection) => selection.choiceId == choiceReference.choiceId,
-    );
-    if (!selection) return null;
-    return (searchedChoice as FeatureChoice).getSelectionValue(selection, this);
+    return null;
   }
 }

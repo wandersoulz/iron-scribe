@@ -1,4 +1,21 @@
-# Draw Steel Digital Character Sheet (OwlBear Rodeo)
+# Iron Scribe
+
+## Description
+
+What is Iron Scribe? Well, it is a place to build and run a hero for the TTRPG Draw Steel. The name is a play on the Draw Steel's name (Draw ~ Scribe and Iron ~ Steel). This project will eventually sync all data to a central database and provide options for a Web UI (which is currently in development) as well as a mobile application (in pre-development using React Native).
+
+There are competing projects that are already full featured and work incredibly well such as ForgeSteel and Draw Steel Tools for Owlbear Rodeo. What I am doing to differentiate this project from them is:
+
+* This can be run completely independent of a virtual tabletop; no need to install an extension for OwlBear Rodeo (though I will at some point add this as a possibility)
+* This will connect to data served through a self-hosted API/PostgresDB.
+* Fully extensible data model; unlike ForgeSteel's data, you can use the model and hard coded data independent of the Iron Scribe applications.
+* Fully documented data model and helper functions (work in progress, as is development).
+
+I want Iron Scribe to be the go-to open source project for all things Draw Steel. Want to run a negotiation? Iron Scribe will handle that. Want to create a custom Ancestry with some wild options? Iron Scribe will handle that. 
+
+I am also working on a data pipeline to automatically pull data from released materials for Draw Steel from MCDM so that Iron Scribe will always have the latest and greatest data.
+
+As of right now, there are no plans to make this a subscribtion but I will eventually be implementing user authentication so that the application can persist user data not just in local storage but also in the database.
 
 ## Data Model
 
@@ -18,7 +35,7 @@ These are meant to be the "high-level" classes and models that are the "meaty" p
 
 Everything below a `Component` is considered a `Feature`. Specific traits on an Ancestry are all `Features` and any selections required for those traits, such as selected skill from a list, are also `Features`. The `Selection` and `Choice` models are described below.
 
-### Choice Model (Inherits from Identifiable)
+### Choice Model (Inherits from Feature)
 
 Choices are tricky to model since a choice can theoretically be any `Feature`. They will also need to contain a way to either get every possible option or enumerate all of the possible options. Modeling the "get" behavior in a way that can eventually be stored in a database is not entirely possible without some custom DSL/JSON representation which is not yet defined.
 

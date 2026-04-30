@@ -7,6 +7,8 @@ import { AncestryDetail } from "../components/ancestry/AncestryDetail";
 import { SkillCard } from "../components/skills/SkillCard";
 import { AbilitiesOverlay } from "../components/ability/AbilitiesOverlay";
 import { ClassCard } from "../components/class/ClassCard";
+import { CareerCard } from "../components/career/CareerCard";
+import { CareerDetail } from "../components/career/CareerDetail";
 
 interface Props {
   heroReference?: HeroReference;
@@ -35,6 +37,7 @@ export const HeroView: React.FC<Props> = ({ heroReference, onNavigate }) => {
 
   const [isAncestryOpen, setIsAncestryOpen] = useState(false);
   const [isAbilitiesOpen, setIsAbilitiesOpen] = useState(false);
+  const [isCareerOpen, setIsCareerOpen] = useState(false);
 
   if (!library || !hero || !heroState) {
     return (
@@ -127,15 +130,15 @@ export const HeroView: React.FC<Props> = ({ heroReference, onNavigate }) => {
           </div>
 
           <div className="lg:col-span-1">
-            <SkillCard hero={hero} />
+            <CareerCard
+              hero={hero}
+              library={library}
+              onClick={() => setIsCareerOpen(true)}
+            />
           </div>
 
-          <div className="p-8 rounded-3xl border-2 border-dashed border-slate-800 flex flex-col items-center justify-center text-slate-600 bg-slate-800/20">
-            <span className="text-4xl mb-4">🔮</span>
-            <h3 className="font-bold text-sm uppercase tracking-widest">
-              Career
-            </h3>
-            <p className="text-[10px] mt-2 opacity-50">Component Coming Soon</p>
+          <div className="lg:col-span-1">
+            <SkillCard hero={hero} />
           </div>
         </div>
       </div>
@@ -165,6 +168,39 @@ export const HeroView: React.FC<Props> = ({ heroReference, onNavigate }) => {
         </div>
         <div className="flex-1 overflow-y-auto">
           <AncestryDetail
+            hero={hero}
+            library={library}
+            isEditable={false}
+            onHeroStateChange={setHeroState as any}
+          />
+        </div>
+      </div>
+
+      {/* Side Detail Panel Overlay - Career */}
+      {isCareerOpen && (
+        <div
+          className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-40 transition-opacity"
+          onClick={() => setIsCareerOpen(false)}
+        ></div>
+      )}
+      <div
+        className={`fixed inset-y-0 right-0 w-full md:w-[600px] bg-slate-900 border-l border-slate-700 shadow-2xl z-50 transform transition-transform duration-500 cubic-bezier(0.4, 0, 0.2, 1) flex flex-col ${
+          isCareerOpen ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
+        <div className="p-8 pb-4 border-b border-slate-800 shrink-0 flex justify-between items-center bg-slate-900/50 backdrop-blur-md sticky top-0 z-10">
+          <h2 className="text-2xl font-black tracking-tight text-white uppercase">
+            Career Details
+          </h2>
+          <button
+            onClick={() => setIsCareerOpen(false)}
+            className="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700 transition-all active:scale-90"
+          >
+            ✕
+          </button>
+        </div>
+        <div className="flex-1 overflow-y-auto">
+          <CareerDetail
             hero={hero}
             library={library}
             isEditable={false}

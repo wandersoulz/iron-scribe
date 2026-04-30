@@ -90,6 +90,4 @@ export const CensorDef: Class = {
       options: DOMAINS as SubclassOption[],
     },
   ] as unknown as SubclassDefinition[],
-  levelFeatures: [],
-  choices: [],
 } as unknown as Class;

@@ -7,6 +7,7 @@ interface Props {
 
 export const SkillCard: React.FC<Props> = ({ hero }) => {
   const skills = hero.getList("skills") as Skill[];
+
   return (
     <div className="group relative overflow-hidden rounded-3xl p-8 border border-slate-700 bg-slate-800/40 cursor-pointer shadow-xl shadow-black/20">
       <div className="absolute -top-12 -right-12 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl" />

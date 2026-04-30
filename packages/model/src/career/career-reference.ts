@@ -1,1 +1,3 @@
-export interface CareerReference {}
+export interface CareerReference {
+  careerId: string;
+}

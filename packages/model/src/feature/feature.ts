@@ -15,6 +15,8 @@ export type FeatureType =
   | "class"
   | "ancestry"
   | "ancestry-trait"
+  | "career"
+  | "perk"
   | "domain"
   | "subclass-option"
   | "subclass-definition"
@@ -111,20 +113,16 @@ export abstract class BaseFeature implements Named {
 }
 
 @RegisterFeature("feature")
-export class Feautre extends BaseFeature {
+export class Feature extends BaseFeature {
   resolveValue(hero: Hero): BaseFeature | null {
-    const resolved = new Feautre();
+    const resolved = new Feature();
     this.resolveBaseValue(hero, resolved);
     return resolved;
   }
 
   isComplete(selections: FeatureChoiceSelection[]): boolean {
-    return (
-      this.choices
-        .map((choice) =>
-          selections.find((selection) => selection.choiceId == choice.id),
-        )
-        .filter((choice) => choice == null).length > 0
+    return this.choices.every((choice) =>
+      selections.some((selection) => selection.choiceId === choice.id),
     );
   }
 }

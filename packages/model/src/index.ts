@@ -23,6 +23,8 @@ export * from "./skill/skill";
 export * from "./skill/skill-group";
 
 export * from "./career/career-reference";
+export * from "./career/career";
+export * from "./perk/perk";
 export * from "./class/class-reference";
 export * from "./class/class";
 export * from "./class/domain";

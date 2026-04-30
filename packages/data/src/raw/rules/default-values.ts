@@ -5,4 +5,7 @@ export const HERO_DEFAULTS = {
   size: Sizes.find((s) => s.name == SizeType.Medium)!.name,
   stability: 0,
   level: 1,
+  wealth: 0,
+  renown: 0,
+  project_points: 0,
 };

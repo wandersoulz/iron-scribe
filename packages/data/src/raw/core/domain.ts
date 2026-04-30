@@ -1,4 +1,4 @@
-import { Domain } from "@iron-scribe/model";
+import { Domain, Modifier } from "@iron-scribe/model";
 
 export const DOMAINS: Domain[] = [
   {
@@ -7,6 +7,18 @@ export const DOMAINS: Domain[] = [
     type: "domain",
     description: "",
     skillGroupId: "Crafting",
+    modifiers: [
+      {
+        modifierType: "list",
+        target: "skills",
+        operation: "add",
+        value: {
+          choiceReferenceValue: {
+            choiceId: "",
+          },
+        },
+      } as Modifier,
+    ] as Modifier[],
   },
   {
     id: "domain_death",

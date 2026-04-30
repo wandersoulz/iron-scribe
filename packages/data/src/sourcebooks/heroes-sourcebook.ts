@@ -10,6 +10,8 @@ import {
   Class,
   ClassFeature,
   Ability,
+  Career,
+  Perk,
 } from "@iron-scribe/model";
 import { Marshaller } from "../marshalling/marshaller";
 
@@ -22,6 +24,8 @@ type HeroesSourcebookRegistries = {
   [RegistryName.Classes]: LazyRegistry<Class>;
   [RegistryName.ClassFeatures]: LazyRegistry<ClassFeature>;
   [RegistryName.Abilities]: LazyRegistry<Ability>;
+  [RegistryName.Careers]: LazyRegistry<Career>;
+  [RegistryName.Perks]: LazyRegistry<Perk>;
 };
 
 export const HeroesSourcebook = new Sourcebook<HeroesSourcebookRegistries>(
@@ -59,6 +63,14 @@ export const HeroesSourcebook = new Sourcebook<HeroesSourcebookRegistries>(
     [RegistryName.Abilities]: new LazyRegistry<Ability>(async () => {
       const data = (await import("../raw/core/classes")).classAbilities;
       return Marshaller.marshallArray(Ability, data);
+    }),
+    [RegistryName.Careers]: new LazyRegistry<Career>(async () => {
+      const data = (await import("../raw/core/careers")).careers;
+      return Marshaller.marshallArray(Career, data as Career[]);
+    }),
+    [RegistryName.Perks]: new LazyRegistry<Perk>(async () => {
+      const data = (await import("../raw/core/perks")).perks;
+      return Marshaller.marshallArray(Perk, data as Perk[]);
     }),
   },
 );
