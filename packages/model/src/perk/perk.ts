@@ -10,10 +10,19 @@ import { RegisterFeature } from "../util/types/feature/registry";
 export class Perk extends BaseFeature {
   type: FeatureType = "perk";
 
+  constructor(
+    public id: string,
+    public name: string,
+    public perkTypeId: string,
+    public description: string,
+  ) {
+    super();
+  }
+
   public resolveValue(hero: Hero): Perk {
     if (this._resolvedCache) return this._resolvedCache as Perk;
 
-    const resolved = new Perk();
+    const resolved = new Perk(this.id, this.name, this.perkTypeId, this.description);
     Object.assign(resolved, this);
     this.resolveBaseValue(hero, resolved);
 

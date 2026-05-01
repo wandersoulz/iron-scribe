@@ -8,21 +8,25 @@ import {
 } from "../util/types/feature/registry";
 import { Library } from "../sourcebook/library";
 import { Identifiable } from "../data/identifiable";
+import { ChoiceProviderRegistry } from "./choice-provider";
 
 export type FeatureType =
   | "feature"
   | "class-feat"
   | "class"
+  | "characteristic"
   | "ancestry"
   | "ancestry-trait"
   | "career"
   | "perk"
+  | "perk-type"
   | "domain"
   | "subclass-option"
   | "subclass-definition"
   | "ability"
   | "skill"
   | "skill-group"
+  | "language"
   | "damage"
   | "damage-immunity"
   | "condition"
@@ -121,9 +125,20 @@ export class Feature extends BaseFeature {
   }
 
   isComplete(selections: FeatureChoiceSelection[]): boolean {
-    return this.choices.every((choice) =>
-      selections.some((selection) => selection.choiceId === choice.id),
-    );
+    return !this.choices.some(choice => !choice.isComplete(selections));
+  }
+}
+
+@RegisterFeature("characteristic")
+export class CharacteristicFeature extends BaseFeature {
+  resolveValue(hero: Hero): BaseFeature | null {
+    const resolved = new CharacteristicFeature();
+    this.resolveBaseValue(hero, resolved);
+    return resolved;
+  }
+
+  isComplete(selections: FeatureChoiceSelection[]): boolean {
+    return true;
   }
 }
 
@@ -147,6 +162,17 @@ export interface ResolveContext {}
 export interface FeatureChoiceResolveContext {
   selections: FeatureChoiceSelection[];
   library: Library;
+}
+
+export class FeatureChoiceDynamicValue implements Identifiable {
+  id: string = "";
+  type: "dynamic" = "dynamic";
+  providerId: string = "";
+  config: Record<string, any> = {};
+
+  resolveValue(hero: Hero): FeatureChoiceDynamicValue {
+    return this;
+  }
 }
 
 export class FeatureChoiceRegistryValue implements Identifiable {
@@ -185,7 +211,8 @@ export class FeatureChoiceStaticValue implements Identifiable {
 
 export type FeatureChoiceValue =
   | FeatureChoiceRegistryValue
-  | FeatureChoiceStaticValue;
+  | FeatureChoiceStaticValue
+  | FeatureChoiceDynamicValue;
 
 @RegisterFeature("feature-choice")
 export class FeatureChoice extends BaseFeature {
@@ -196,6 +223,7 @@ export class FeatureChoice extends BaseFeature {
       subTypes: [
         { value: FeatureChoiceStaticValue, name: "static" },
         { value: FeatureChoiceRegistryValue, name: "registry" },
+        { value: FeatureChoiceDynamicValue, name: "dynamic" },
       ],
     },
   })
@@ -247,6 +275,9 @@ export class FeatureChoice extends BaseFeature {
         library
           .getCompositeRegistry<BaseFeature>(this.values.registryName)
           .getSync(selection.selectedOptionId) || null;
+    } else if (this.values.type == "dynamic") {
+      const options = ChoiceProviderRegistry.resolve(this.values, hero);
+      val = options.find((opt) => opt.id === selection.selectedOptionId) || null;
     } else {
       val =
         this.values.contents.find(

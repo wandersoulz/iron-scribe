@@ -1,4 +1,5 @@
-import { Named } from "../data/named";
+import { Feature } from "../feature/feature";
+import { RegisterFeature } from "../util/types/feature/registry";
 
 export enum CharacteristicName {
   Might = "Might",
@@ -8,9 +9,13 @@ export enum CharacteristicName {
   Presence = "Presence",
 }
 
-export class Characteristic implements Named {
+@RegisterFeature("characteristic")
+export class Characteristic extends Feature {
   constructor(
     public id: string,
     public name: CharacteristicName,
-  ) {}
+    public value?: number,
+  ) {
+    super();
+  }
 }

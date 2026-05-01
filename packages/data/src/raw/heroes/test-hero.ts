@@ -13,16 +13,16 @@ export const TestHero: HeroReference = {
       selectedOptionId: "feat_censor_array_0",
     },
     {
-      choiceId: "choice_censor_array_0_val_0",
-      selectedOptionId: "feat_char_agility_2",
+      choiceId: "choice_char_agility",
+      selectedOptionId: "feat_char_agility_val_0",
     },
     {
-      choiceId: "choice_censor_array_0_val_1",
-      selectedOptionId: "feat_char_reason_-1",
+      choiceId: "choice_char_reason",
+      selectedOptionId: "feat_char_reason_val_1",
     },
     {
-      choiceId: "choice_censor_array_0_val_2",
-      selectedOptionId: "feat_char_intuition_-1",
+      choiceId: "choice_char_intuition",
+      selectedOptionId: "feat_char_intuition_val_2",
     },
     {
       choiceId: "censor_order",

@@ -17,6 +17,7 @@ import {
   FeatureFilterResolver,
   BaseFeature,
   FeatureChoice,
+  ChoiceProviderRegistry,
 } from "@iron-scribe/model";
 import { AbilityCard } from "./AbilityCard";
 
@@ -351,6 +352,9 @@ const ChoiceSelector: React.FC<{
           );
           setOptions(filtered);
         });
+    } else if (choice.values.type == "dynamic") {
+      console.log(ChoiceProviderRegistry.resolve(choice.values, hero));
+      setOptions([]);
     } else {
       setOptions(choice.values.contents);
     }

@@ -1,0 +1,52 @@
+import { Language } from "@iron-scribe/model";
+
+export const Languages: Language[] = [
+  new Language(
+    "lang-caelian",
+    "Caelian",
+    "The Common tongue of the setting, spoken by almost everyone.",
+  ),
+  new Language("lang-riojan", "Riojan", "Spoken in Rioja"),
+  new Language("lang-khemharic", "Khemharic", "Spoken in Khemhara"),
+  new Language("lang-vaslorian", "Vaslorian", "Spoken in Vasloria"),
+  new Language("lang-vanigaric", "Vanigaric", "Spoken in Vanigar"),
+  new Language("lang-khoursirian", "Khoursirian", "Spoken in Khoursir"),
+  new Language("lang-higaric", "Higaric", "Spoken in Higara"),
+  new Language("lang-ixian", "Ixian", "Spoken in Ix"),
+  new Language("lang-phaedran", "Phaedran", "Spoken in Phaedros"),
+  new Language(
+    "lang-axiomatic",
+    "Axiomatic",
+    "The native language of the Memonek",
+  ),
+  new Language("lang-hyrallic", "Hyrallic", "The language of High Elves."),
+  new Language("lang-illyvric", "Illyvric", "The language of Shadow Elves."),
+  new Language("lang-yllyric", "Yllyric", "The language of Wode Elves."),
+  new Language("lang-zaliac", "Zaliac", "The language of Dwarves."),
+  new Language("lang-kalliak", "Kalliak", "The language of Orcs."),
+  new Language(
+    "lang-vastariax",
+    "Vastariax",
+    "High Draconic, spoken by Dragon Knights and dragons.",
+  ),
+  new Language("lang-hakaan", "Hakaan", "The language of the Hakaan"),
+  new Language(
+    "lang-mindspeech",
+    "Mindspeech",
+    "A telepathic language used by Talents and certain psionic creatures.",
+  ),
+  new Language("lang-filliaric", "Filliaric", "The language of the Angulotl."),
+  new Language("lang-kethaic", "Kethaic", "Spoken by Kobolds."),
+  new Language(
+    "lang-khel",
+    "Khelt",
+    "Spoken by Bugbears and Sylvan creatures.",
+  ),
+  new Language("lang-vhoric", "Vhoric", "Low Kuric / Primordial."),
+  new Language("lang-tholl", "Tholl", "Higher Demonic."),
+  new Language("lang-proto-ctholl", "Proto-Ctholl", "Lower Demonic."),
+  new Language("lang-olothec", "Olothec", "The language of Aboleths."),
+  new Language("lang-variac", "Variac", "Deep Speech."),
+  new Language("lang-voll", "Voll", "The language of Time Raiders and Gith."),
+  new Language("lang-zahariax", "Za'hariax", "The language of Beholderkin."),
+];

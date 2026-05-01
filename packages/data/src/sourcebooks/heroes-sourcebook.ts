@@ -12,6 +12,8 @@ import {
   Ability,
   Career,
   Perk,
+  PerkType,
+  Language,
 } from "@iron-scribe/model";
 import { Marshaller } from "../marshalling/marshaller";
 
@@ -26,6 +28,8 @@ type HeroesSourcebookRegistries = {
   [RegistryName.Abilities]: LazyRegistry<Ability>;
   [RegistryName.Careers]: LazyRegistry<Career>;
   [RegistryName.Perks]: LazyRegistry<Perk>;
+  [RegistryName.PerkTypes]: LazyRegistry<PerkType>;
+  [RegistryName.Languages]: LazyRegistry<Language>;
 };
 
 export const HeroesSourcebook = new Sourcebook<HeroesSourcebookRegistries>(
@@ -69,8 +73,16 @@ export const HeroesSourcebook = new Sourcebook<HeroesSourcebookRegistries>(
       return Marshaller.marshallArray(Career, data as Career[]);
     }),
     [RegistryName.Perks]: new LazyRegistry<Perk>(async () => {
-      const data = (await import("../raw/core/perks")).perks;
+      const data = (await import("../raw/core/perks/perks")).Perks;
       return Marshaller.marshallArray(Perk, data as Perk[]);
+    }),
+    [RegistryName.PerkTypes]: new LazyRegistry<PerkType>(async () => {
+      const data = (await import("../raw/core/perks/perks")).PerkTypeInstances;
+      return Marshaller.marshallArray(PerkType, data);
+    }),
+    [RegistryName.Languages]: new LazyRegistry<Language>(async () => {
+      const data = (await import("../languages/core/languages")).Languages;
+      return Marshaller.marshallArray(Language, data);
     }),
   },
 );

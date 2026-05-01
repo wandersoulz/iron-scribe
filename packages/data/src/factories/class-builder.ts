@@ -42,7 +42,6 @@ export class ClassBuilder {
     );
 
     const arrayChoiceId = `choice_${def.id}_array`;
-    const arraySelection = selections.find((s) => s.choiceId === arrayChoiceId);
 
     const arrayChoices: FeatureChoice[] = [
       plainToInstance(FeatureChoice, {
@@ -53,68 +52,33 @@ export class ClassBuilder {
         values: {
           id: `values_${def.id}_array`,
           type: "static",
-          contents: def.characteristicArrays
-            .filter((arr, arrIdx) => {
-              if (!arraySelection) return true;
-              return (
-                arraySelection.selectedOptionId ===
-                `feat_${def.id}_array_${arrIdx}`
-              );
-            })
-            .map((arr, arrIdx) =>
-              plainToInstance(ClassFeature, {
-                id: `feat_${def.id}_array_${arrIdx}`,
-                name: arr.join(", "),
-                type: "class-feat",
-                description: `Assign ${arr.join(", ")} to your non-primary characteristics.`,
-                choices: arr.map((val, valIdx) => {
-                  const valChoiceId = `choice_${def.id}_array_${arrIdx}_val_${valIdx}`;
-                  const valSelection = selections.find(
-                    (s) => s.choiceId === valChoiceId,
-                  );
-                  return plainToInstance(FeatureChoice, {
-                    id: valChoiceId,
-                    name: `Select characteristic for ${val}`,
-                    type: "feature-choice",
-                    count: 1,
-                    values: {
-                      id: `values_${def.id}_array_${arrIdx}_val_${valIdx}`,
-                      type: "static",
-                      contents: remainingChars
-                        .filter((char) => {
-                          if (!valSelection) return true;
-                          return (
-                            valSelection.selectedOptionId ===
-                            `feat_char_${char.toLowerCase()}_${val.toString()}`
-                          );
-                        })
-                        .map((char) =>
-                          plainToInstance(ClassFeature, {
-                            id: `feat_char_${char.toLowerCase()}_${val.toString()}`,
-                            name: `${char} (${val > 0 ? "+" : ""}${val})`,
-                            type: "class-feat",
-                            description: `Your ${char} score is ${val}.`,
-                            modifiers: [
-                              new Modifier(
-                                "stat",
-                                "base",
-                                char.toLowerCase(),
-                                new ModifierValue({
-                                  type: StatDynamicValueType.LiteralValue,
-                                  value: val,
-                                  returnType: "number",
-                                } as NumericValue),
-                              ),
-                            ],
-                          }),
-                        ),
-                    },
-                  });
-                }),
-              }),
-            ),
+          contents: def.characteristicArrays.map((arr, arrIdx) =>
+            plainToInstance(ClassFeature, {
+              id: `feat_${def.id}_array_${arrIdx}`,
+              name: arr.join(", "),
+              type: "class-feat",
+              description: `Assign ${arr.join(", ")} to your non-primary characteristics.`,
+            }),
+          ),
         },
       }),
+      ...remainingChars.map((char) =>
+        plainToInstance(FeatureChoice, {
+          id: `choice_char_${char.toLowerCase()}`,
+          name: `${char}`,
+          type: "feature-choice",
+          count: 1,
+          values: {
+            id: `values_char_${char.toLowerCase()}`,
+            type: "dynamic",
+            providerId: "characteristic-array-provider",
+            config: {
+              sourceChoiceId: arrayChoiceId,
+              characteristic: char,
+            },
+          },
+        }),
+      ),
     ];
 
     // Subclass choices

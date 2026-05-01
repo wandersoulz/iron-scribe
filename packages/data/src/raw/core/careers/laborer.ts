@@ -12,20 +12,13 @@ import {
   StringValue,
 } from "@iron-scribe/model";
 import { SkillGroupIds, Skills } from "../../../skills/core/skills";
+import { PerkTypeIds } from "../perks/perks";
 
 export const Laborer: Career = {
   id: "career-laborer",
   name: "Laborer",
   description:
-    "You worked as a farmer, builder, clothes washer, forester, miner, or \
-some other profession engaged in hard manual labor. In defining your \
-career, think about the following questions: \
-\
-* What type of manual labor did you do? \
-* What important friendship did you make on the job? \
-* Where did you go with your coworkers to blow off steam when the \
-job was done? \
-* What aspect of the job was most difficult for you?",
+    "You worked as a farmer, builder, clothes washer, forester, miner, or some other profession engaged in hard manual labor.",
   type: "career",
   wealth: 0,
   renown: 0,
@@ -72,6 +65,26 @@ job was done? \
       value: {
         choiceReferenceValue: {
           choiceId: "choice-laborer-skill-2",
+        },
+      },
+    },
+    {
+      modifierType: "list",
+      operation: "add",
+      target: "languages",
+      value: {
+        choiceReferenceValue: {
+          choiceId: "choice-laborer-language",
+        },
+      },
+    },
+    {
+      modifierType: "list",
+      operation: "add",
+      target: "perks",
+      value: {
+        choiceReferenceValue: {
+          choiceId: "choice-laborer-perk",
         },
       },
     },
@@ -179,7 +192,7 @@ adventuring life.",
       type: "feature-choice",
       count: 1,
       values: {
-        id: "ffff",
+        id: "choice-laborer-skill-2-registry-values",
         type: "registry",
         registryName: RegistryName.Skills,
       } as unknown as FeatureChoiceRegistryValue,
@@ -197,6 +210,33 @@ adventuring life.",
             value: SkillGroupIds.Crafting,
           },
         ],
+      },
+    } as FeatureChoice,
+    {
+      id: "choice-laborer-language",
+      name: "Language",
+      type: "feature-choice",
+      count: 1,
+      values: {
+        id: "choice-laborer-language-registry-values",
+        type: "registry",
+        registryName: RegistryName.Languages,
+      } as unknown as FeatureChoiceRegistryValue,
+    } as FeatureChoice,
+    {
+      id: "choice-laborer-perk",
+      name: "Exploration Perk",
+      type: "feature-choice",
+      count: 1,
+      values: {
+        id: "choice-laborer-perk-registry-values",
+        type: "registry",
+        registryName: RegistryName.Perks,
+      } as unknown as FeatureChoiceRegistryValue,
+      filter: {
+        type: "eq",
+        field: "perkTypeId",
+        value: PerkTypeIds.Exploration,
       },
     } as FeatureChoice,
   ],

@@ -25,6 +25,7 @@ export * from "./skill/skill-group";
 export * from "./career/career-reference";
 export * from "./career/career";
 export * from "./perk/perk";
+export * from "./perk/perk-type";
 export * from "./class/class-reference";
 export * from "./class/class";
 export * from "./class/domain";
@@ -32,9 +33,12 @@ export * from "./class/subclass-option";
 export * from "./class/class-feature";
 export * from "./class/subclass-definition";
 export * from "./culture/culture-state";
+export * from "./language/language";
 
 export * from "./feature/feature";
 export * from "./feature/feature-filter-resolver";
+export * from "./feature/choice-provider";
+export * from "./feature/providers/characteristic-array-provider";
 
 // Rules & Modifiers
 export * from "./rules/characteristic";

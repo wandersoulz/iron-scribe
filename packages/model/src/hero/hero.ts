@@ -30,8 +30,6 @@ export class Hero extends StatValueResolver {
     this.id = reference.id;
     this.name = reference.name;
     this.resolveAll();
-    console.log(this.featureRegistry.getAllModifiers());
-    console.log("resolved all values");
   }
 
   private resolveAll() {
@@ -39,6 +37,15 @@ export class Hero extends StatValueResolver {
     this.resolvedComponents = this.components
       .map((c) => c.resolveValue(this))
       .filter((c) => !!c) as BaseFeature[];
+
+    (this.reference.selections || []).forEach((s) => {
+      const choice = this.featureRegistry
+        .getAllChoices()
+        .find((c) => c.id === s.choiceId);
+      if (choice) {
+        choice.getSelectionValue(s, this);
+      }
+    });
   }
 
   public get allAbilities(): Ability[] {
@@ -145,7 +152,6 @@ export class Hero extends StatValueResolver {
   }
 
   public getList(listName: string): (string | number | BaseFeature)[] {
-    console.log(listName);
     if (this.listCache.has(listName)) {
       return this.listCache.get(listName) || [];
     }
@@ -153,7 +159,6 @@ export class Hero extends StatValueResolver {
     const relevantModifiers = this.getAllModifiers().filter(
       (m) => m.modifierType === "list" && m.target === listName,
     );
-    console.log(relevantModifiers);
     const results = relevantModifiers
       .filter((mod) => mod.operation === "add")
       .map((mod) => mod.value)

@@ -12,11 +12,10 @@ import {
   Library,
   RegistryName,
   Career,
-  Named,
   FeatureFilterResolver,
   BaseFeature,
   FeatureChoice,
-  Feature,
+  ChoiceProviderRegistry,
 } from "@iron-scribe/model";
 
 interface Props {
@@ -82,15 +81,15 @@ export const CareerDetail: React.FC<Props> = ({
 
       <View style={styles.statsSection}>
         <View style={styles.statBox}>
-          <Text style={styles.statLabel}>WEALTH</Text>
+          <Text style={styles.statLabel}>STARTING WEALTH</Text>
           <Text style={styles.statValue}>{career.wealth}</Text>
         </View>
         <View style={styles.statBox}>
-          <Text style={styles.statLabel}>RENOWN</Text>
+          <Text style={styles.statLabel}>STARTING RENOWN</Text>
           <Text style={styles.statValue}>{career.renown}</Text>
         </View>
         <View style={styles.statBox}>
-          <Text style={styles.statLabel}>PROJECT POINTS</Text>
+          <Text style={styles.statLabel}>STARTING PROJECT POINTS</Text>
           <Text style={styles.statValue}>{career.projectPoints}</Text>
         </View>
       </View>
@@ -124,12 +123,12 @@ const ChoiceSelector: React.FC<{
   onSelectionChange: (choiceId: string, value: string) => void;
   isEditable: boolean;
 }> = ({ choice, hero, library, onSelectionChange, isEditable }) => {
-  const [options, setOptions] = useState<Feature[]>([]);
+  const [options, setOptions] = useState<BaseFeature[]>([]);
 
   useEffect(() => {
     if (choice.values.type === "registry") {
       library
-        .getCompositeRegistry<Feature>(choice.values.registryName)
+        .getCompositeRegistry<BaseFeature>(choice.values.registryName)
         .getAll()
         .then((allOptions) => {
           const filtered = allOptions.filter((opt) =>
@@ -141,10 +140,16 @@ const ChoiceSelector: React.FC<{
           );
           setOptions(filtered);
         });
+    } else if (choice.values.type === "dynamic") {
+      const dynamicOptions = ChoiceProviderRegistry.resolve(
+        choice.values,
+        hero,
+      );
+      setOptions(dynamicOptions);
     } else {
       setOptions(choice.values.contents);
     }
-  }, [library, choice.values, choice.filter, hero]);
+  }, [library, choice.values, choice.filter, hero, hero.reference.selections]);
 
   const selectedValue =
     (hero.reference.selections || []).find((s) => s.choiceId === choice.id)
@@ -164,44 +169,43 @@ const ChoiceSelector: React.FC<{
 
       {isEditable ? (
         <View style={styles.pickerContainer}>
-          {options.map((opt) => {
-            const isSelected = selectedValue === opt.id;
-            return (
-              <TouchableOpacity
-                key={opt.id}
-                style={[
-                  styles.optionButton,
-                  isSelected && styles.optionButtonSelected,
-                ]}
-                onPress={() => onSelectionChange(choice.id, opt.id)}
-              >
-                <View style={styles.optionHeader}>
-                  <Text
-                    style={[
-                      styles.optionText,
-                      isSelected && styles.optionTextSelected,
-                    ]}
-                  >
-                    {opt.name}
-                  </Text>
-                  {isSelected && <Text style={styles.checkMark}>✓</Text>}
-                </View>
-                {isSelected && opt.description && (
-                  <Text style={styles.optionDescription}>
-                    {opt.description}
-                  </Text>
-                )}
-              </TouchableOpacity>
-            );
-          })}
+          {options.length > 0 ? (
+            options.map((opt) => {
+              const isSelected = selectedValue === opt.id;
+              return (
+                <TouchableOpacity
+                  key={opt.id}
+                  style={[
+                    styles.optionButton,
+                    isSelected && styles.optionButtonSelected,
+                  ]}
+                  onPress={() => onSelectionChange(choice.id, opt.id)}
+                >
+                  <View>
+                    {isSelected && opt.description ? (
+                      <Text style={styles.optionDescription}>
+                        {opt.description}
+                      </Text>
+                    ) : (
+                      <Text />
+                    )}
+                  </View>
+                </TouchableOpacity>
+              );
+            })
+          ) : (
+            <Text />
+          )}
         </View>
       ) : (
         <View style={styles.readOnlyChoice}>
           <Text style={styles.choiceValue}>{selectedLabel}</Text>
-          {selectedDescription && (
+          {selectedDescription ? (
             <Text style={styles.selectedDescription}>
               {selectedDescription}
             </Text>
+          ) : (
+            <Text />
           )}
         </View>
       )}
