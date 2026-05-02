@@ -17,9 +17,8 @@ import {
   FeatureFilterResolver,
   BaseFeature,
   FeatureChoice,
-  ChoiceProviderRegistry,
 } from "@iron-scribe/model";
-import { AbilityCard } from "./AbilityCard";
+import { AbilityCard } from "../ability/AbilityCard";
 
 interface Props {
   hero: Hero;
@@ -72,7 +71,7 @@ export const AncestryDetail: React.FC<Props> = ({
   }, [hero.ancestry!.purchasedTraits]);
 
   if (ancestry == null) {
-    return <>Select Ancestry...</>;
+    return <Text style={styles.loadingText}>Select Ancestry...</Text>;
   }
   const availablePoints = (ancestry.ancestryPoints || 0) - spentPoints;
 
@@ -82,7 +81,7 @@ export const AncestryDetail: React.FC<Props> = ({
     value: string,
   ) => {
     if (!isEditable) return;
-    const newState = structuredClone(hero.reference);
+    const newState = JSON.parse(JSON.stringify(hero.reference));
 
     if (!newState.modules?.ancestry) return;
 
@@ -95,7 +94,7 @@ export const AncestryDetail: React.FC<Props> = ({
       if (!newState.selections) newState.selections = [];
 
       const selectionIndex = newState.selections.findIndex(
-        (s) => s.choiceId === choiceId,
+        (s: any) => s.choiceId === choiceId,
       );
       if (selectionIndex > -1) {
         newState.selections[selectionIndex].selectedOptionId = value;
@@ -111,12 +110,12 @@ export const AncestryDetail: React.FC<Props> = ({
 
   const handlePurchaseToggle = (traitToToggle: AncestryTrait) => {
     if (!isEditable) return;
-    const newState = structuredClone(hero.reference);
+    const newState = JSON.parse(JSON.stringify(hero.reference));
     if (!newState.modules?.ancestry) return;
 
     const currentPurchased = newState.modules.ancestry.purchasedTraits || [];
     const traitIndex = currentPurchased.findIndex(
-      (t) => t.traitId === traitToToggle.id,
+      (t: any) => t.traitId === traitToToggle.id,
     );
 
     if (traitIndex > -1) {
@@ -140,7 +139,7 @@ export const AncestryDetail: React.FC<Props> = ({
       );
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView contentContainerStyle={styles.scrollContent}>
       <View style={styles.header}>
         <Text style={styles.ancestryName}>{ancestry.name.toUpperCase()}</Text>
         <Text style={styles.ancestryDescription}>
@@ -170,19 +169,14 @@ export const AncestryDetail: React.FC<Props> = ({
       {displayedPurchasableTraits.length > 0 && (
         <View style={styles.section}>
           <View style={styles.sectionHeaderRow}>
-            <View style={styles.sectionHeaderWithDivider}>
+            <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>PURCHASABLE TRAITS</Text>
               <View style={styles.divider} />
             </View>
             {isEditable && (
-              <View style={styles.pointsBadge}>
+              <View style={styles.pointsDisplay}>
                 <Text style={styles.pointsLabel}>AVAILABLE</Text>
-                <Text
-                  style={[
-                    styles.pointsValue,
-                    availablePoints < 0 && styles.pointsNegative,
-                  ]}
-                >
+                <Text style={[styles.pointsValue, availablePoints < 0 && styles.pointsValueNegative]}>
                   {availablePoints}{" "}
                   <Text style={styles.pointsUnit}>POINTS</Text>
                 </Text>
@@ -252,14 +246,9 @@ const TraitDetailCard: React.FC<{
       ]}
     >
       <View style={styles.traitHeader}>
-        <View style={styles.traitTitleRow}>
-          <Text
-            style={[
-              styles.traitName,
-              (isPurchased || !isPurchasable) && styles.traitNameActive,
-            ]}
-          >
-            {trait.name.toUpperCase()}
+        <View style={styles.traitHeaderInfo}>
+          <Text style={[styles.traitName, (isPurchased || !isPurchasable) && styles.traitNameActive]}>
+            {trait.name}
           </Text>
           {isPurchased && !isEditable && (
             <View style={styles.ownedBadge}>
@@ -273,19 +262,11 @@ const TraitDetailCard: React.FC<{
             disabled={disabled}
             style={[
               styles.purchaseButton,
-              isPurchased
-                ? styles.purchaseButtonActive
-                : disabled
-                  ? styles.purchaseButtonDisabled
-                  : styles.purchaseButtonInactive,
+              isPurchased && styles.purchaseButtonActive,
+              disabled && !isPurchased && styles.purchaseButtonDisabled,
             ]}
           >
-            <Text
-              style={[
-                styles.purchaseButtonText,
-                isPurchased && styles.purchaseButtonTextActive,
-              ]}
-            >
+            <Text style={[styles.purchaseButtonText, isPurchased && styles.purchaseButtonTextActive]}>
               {isPurchased ? "✓ PURCHASED" : `BUY (${trait.cost} PT)`}
             </Text>
           </TouchableOpacity>
@@ -295,7 +276,7 @@ const TraitDetailCard: React.FC<{
       <Text style={styles.traitDescription}>{trait.description}</Text>
 
       {trait.abilities && trait.abilities.length > 0 && (
-        <View style={styles.abilityList}>
+        <View style={styles.traitAbilities}>
           {trait.abilities.map((ability) => (
             <AbilityCard key={ability.id} ability={ability} />
           ))}
@@ -353,7 +334,6 @@ const ChoiceSelector: React.FC<{
           setOptions(filtered);
         });
     } else if (choice.values.type == "dynamic") {
-      console.log(ChoiceProviderRegistry.resolve(choice.values, hero));
       setOptions([]);
     } else {
       setOptions(choice.values.contents);
@@ -361,7 +341,7 @@ const ChoiceSelector: React.FC<{
   }, [library, choice.values, choice.filter, hero]);
 
   if (options.length == 0) {
-    return <Text>Loading...</Text>;
+    return <Text style={styles.loadingOptionsText}>Loading...</Text>;
   }
 
   const selectedValue =
@@ -374,18 +354,17 @@ const ChoiceSelector: React.FC<{
 
   if (!isEditable) {
     return (
-      <View style={styles.readOnlyChoice}>
-        <Text style={styles.choiceLabel}>{choice.name.toUpperCase()}</Text>
+      <View style={styles.readonlyChoice}>
+        <Text style={styles.choiceLabel}>{choice.name}</Text>
         <Text style={styles.choiceValue}>{selectedLabel}</Text>
       </View>
     );
   }
 
   return (
-    <View style={styles.editableChoice}>
-      <Text style={styles.choiceLabel}>{choice.name.toUpperCase()}</Text>
-      <View style={styles.pickerContainer}>
-        {/* Simplified picker: list of options as buttons if few, or a styled Text for now */}
+    <View style={styles.choiceContainer}>
+      <Text style={styles.choiceLabel}>{choice.name}</Text>
+      <View style={styles.optionGrid}>
         {options.map((opt: any) => {
           const id = opt.id;
           const label = opt.name;
@@ -400,12 +379,7 @@ const ChoiceSelector: React.FC<{
               onPress={() => onSelectionChange(traitId, choice.id, id)}
               disabled={disabled}
             >
-              <Text
-                style={[
-                  styles.optionText,
-                  isSelected && styles.optionTextSelected,
-                ]}
-              >
+              <Text style={[styles.optionText, isSelected && styles.optionTextSelected]}>
                 {label}
               </Text>
             </TouchableOpacity>
@@ -417,9 +391,16 @@ const ChoiceSelector: React.FC<{
 };
 
 const styles = StyleSheet.create({
-  container: {
+  scrollContent: {
     padding: 24,
     gap: 32,
+  },
+  loadingText: {
+    color: "#94a3b8",
+    padding: 32,
+    textAlign: "center",
+    fontWeight: "900",
+    letterSpacing: 2,
   },
   header: {
     gap: 8,
@@ -433,8 +414,8 @@ const styles = StyleSheet.create({
   ancestryDescription: {
     fontSize: 16,
     color: "#94a3b8",
-    lineHeight: 24,
     fontStyle: "italic",
+    lineHeight: 24,
   },
   section: {
     gap: 16,
@@ -443,118 +424,25 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
+    flex: 1,
   },
   sectionHeaderRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
   },
-  sectionHeaderWithDivider: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-  },
   sectionTitle: {
     fontSize: 11,
     fontWeight: "900",
-    color: "#6366f1", // indigo-400
+    color: "#818cf8",
     letterSpacing: 2,
   },
   divider: {
+    flex: 1,
     height: 1,
     backgroundColor: "#1e293b",
-    flex: 1,
   },
-  traitList: {
-    gap: 20,
-  },
-  traitCard: {
-    padding: 20,
-    borderRadius: 20,
-    borderWidth: 2,
-    borderColor: "#1e293b",
-    backgroundColor: "rgba(30, 41, 59, 0.4)",
-  },
-  traitCardPurchased: {
-    borderColor: "rgba(99, 102, 241, 0.5)",
-    backgroundColor: "rgba(30, 41, 59, 0.8)",
-  },
-  traitCardDisabled: {
-    opacity: 0.4,
-    backgroundColor: "rgba(15, 23, 42, 0.4)",
-  },
-  traitHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    marginBottom: 12,
-  },
-  traitTitleRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-    flex: 1,
-  },
-  traitName: {
-    fontSize: 18,
-    fontWeight: "900",
-    color: "#f1f5f9",
-  },
-  traitNameActive: {
-    color: "#818cf8",
-  },
-  ownedBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 6,
-    backgroundColor: "rgba(99, 102, 241, 0.1)",
-    borderWidth: 1,
-    borderColor: "rgba(99, 102, 241, 0.2)",
-  },
-  ownedBadgeText: {
-    fontSize: 9,
-    fontWeight: "900",
-    color: "#818cf8",
-    letterSpacing: 1,
-  },
-  purchaseButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 10,
-    borderWidth: 1,
-  },
-  purchaseButtonInactive: {
-    backgroundColor: "#334155",
-    borderColor: "#475569",
-  },
-  purchaseButtonActive: {
-    backgroundColor: "#4f46e5",
-    borderColor: "#6366f1",
-  },
-  purchaseButtonDisabled: {
-    backgroundColor: "#0f172a",
-    borderColor: "#1e293b",
-  },
-  purchaseButtonText: {
-    fontSize: 10,
-    fontWeight: "900",
-    color: "#cbd5e1",
-  },
-  purchaseButtonTextActive: {
-    color: "#ffffff",
-  },
-  traitDescription: {
-    fontSize: 14,
-    color: "#94a3b8",
-    lineHeight: 20,
-    marginBottom: 20,
-  },
-  abilityList: {
-    gap: 12,
-    marginBottom: 16,
-  },
-  pointsBadge: {
+  pointsDisplay: {
     alignItems: "flex-end",
     marginLeft: 20,
   },
@@ -569,26 +457,118 @@ const styles = StyleSheet.create({
     fontWeight: "900",
     color: "#818cf8",
   },
-  pointsNegative: {
+  pointsValueNegative: {
     color: "#ef4444",
   },
   pointsUnit: {
     fontSize: 10,
     color: "#64748b",
   },
-  readOnlyChoice: {
+  traitList: {
+    gap: 20,
+  },
+  traitCard: {
+    padding: 20,
+    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: "#1e293b",
+    backgroundColor: "rgba(15, 23, 42, 0.4)",
+  },
+  traitCardPurchased: {
+    borderColor: "rgba(79, 70, 229, 0.5)",
+    backgroundColor: "rgba(15, 23, 42, 0.8)",
+  },
+  traitCardDisabled: {
+    opacity: 0.4,
+    backgroundColor: "rgba(2, 6, 23, 0.4)",
+  },
+  traitHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    marginBottom: 12,
+  },
+  traitHeaderInfo: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    flex: 1,
+  },
+  traitName: {
+    fontSize: 18,
+    fontWeight: "900",
+    color: "#f1f5f9",
+    letterSpacing: -0.5,
+  },
+  traitNameActive: {
+    color: "#818cf8",
+  },
+  ownedBadge: {
+    backgroundColor: "rgba(129, 140, 248, 0.1)",
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: "rgba(129, 140, 248, 0.2)",
+  },
+  ownedBadgeText: {
+    fontSize: 9,
+    fontWeight: "900",
+    color: "#818cf8",
+    letterSpacing: 1,
+  },
+  purchaseButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
+    backgroundColor: "#334155",
+    borderWidth: 1,
+    borderColor: "#475569",
+  },
+  purchaseButtonActive: {
+    backgroundColor: "#4f46e5",
+    borderColor: "#6366f1",
+  },
+  purchaseButtonDisabled: {
+    backgroundColor: "#020617",
+    borderColor: "#1e293b",
+  },
+  purchaseButtonText: {
+    fontSize: 10,
+    fontWeight: "900",
+    color: "#94a3b8",
+  },
+  purchaseButtonTextActive: {
+    color: "#ffffff",
+  },
+  traitDescription: {
+    fontSize: 14,
+    color: "#94a3b8",
+    lineHeight: 20,
+    marginBottom: 20,
+  },
+  traitAbilities: {
+    gap: 12,
+    marginBottom: 16,
+  },
+  loadingOptionsText: {
+    color: "#64748b",
+    fontSize: 12,
+    fontStyle: "italic",
+  },
+  readonlyChoice: {
     marginTop: 12,
     padding: 12,
     borderRadius: 12,
-    backgroundColor: "rgba(15, 23, 42, 0.3)",
+    backgroundColor: "rgba(2, 6, 23, 0.3)",
     borderWidth: 1,
     borderColor: "rgba(30, 41, 59, 0.5)",
   },
-  editableChoice: {
+  choiceContainer: {
     marginTop: 12,
     padding: 12,
     borderRadius: 12,
-    backgroundColor: "rgba(15, 23, 42, 0.5)",
+    backgroundColor: "rgba(2, 6, 23, 0.5)",
     borderWidth: 1,
     borderColor: "rgba(30, 41, 59, 0.5)",
     gap: 10,
@@ -598,13 +578,14 @@ const styles = StyleSheet.create({
     fontWeight: "900",
     color: "#64748b",
     letterSpacing: 1,
+    textTransform: "uppercase",
   },
   choiceValue: {
     fontSize: 14,
-    fontWeight: "700",
+    fontWeight: "bold",
     color: "#818cf8",
   },
-  pickerContainer: {
+  optionGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 8,

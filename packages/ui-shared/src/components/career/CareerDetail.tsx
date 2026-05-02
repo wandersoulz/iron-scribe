@@ -46,7 +46,7 @@ export const CareerDetail: React.FC<Props> = ({
 
   if (career == null) {
     return (
-      <View style={styles.container}>
+      <View style={styles.emptyContainer}>
         <Text style={styles.loadingText}>Select Career...</Text>
       </View>
     );
@@ -54,12 +54,12 @@ export const CareerDetail: React.FC<Props> = ({
 
   const handleSelectionChange = (choiceId: string, value: string) => {
     if (!isEditable) return;
-    const newState = structuredClone(hero.reference);
+    const newState = JSON.parse(JSON.stringify(hero.reference));
 
     if (!newState.selections) newState.selections = [];
 
     const selectionIndex = newState.selections.findIndex(
-      (s) => s.choiceId === choiceId,
+      (s: any) => s.choiceId === choiceId,
     );
     if (selectionIndex > -1) {
       newState.selections[selectionIndex].selectedOptionId = value;
@@ -73,25 +73,16 @@ export const CareerDetail: React.FC<Props> = ({
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView contentContainerStyle={styles.scrollContent}>
       <View style={styles.header}>
         <Text style={styles.careerName}>{career.name.toUpperCase()}</Text>
         <Text style={styles.careerDescription}>{career.description}</Text>
       </View>
 
-      <View style={styles.statsSection}>
-        <View style={styles.statBox}>
-          <Text style={styles.statLabel}>STARTING WEALTH</Text>
-          <Text style={styles.statValue}>{career.wealth}</Text>
-        </View>
-        <View style={styles.statBox}>
-          <Text style={styles.statLabel}>STARTING RENOWN</Text>
-          <Text style={styles.statValue}>{career.renown}</Text>
-        </View>
-        <View style={styles.statBox}>
-          <Text style={styles.statLabel}>STARTING PROJECT POINTS</Text>
-          <Text style={styles.statValue}>{career.projectPoints}</Text>
-        </View>
+      <View style={styles.statsRow}>
+        <StatBox label="STARTING WEALTH" value={career.wealth} />
+        <StatBox label="STARTING RENOWN" value={career.renown} />
+        <StatBox label="STARTING PROJECT POINTS" value={career.projectPoints} />
       </View>
 
       <View style={styles.section}>
@@ -115,6 +106,13 @@ export const CareerDetail: React.FC<Props> = ({
     </ScrollView>
   );
 };
+
+const StatBox: React.FC<{ label: string; value: number }> = ({ label, value }) => (
+  <View style={styles.statBox}>
+    <Text style={styles.statLabel}>{label}</Text>
+    <Text style={styles.statValue}>{value}</Text>
+  </View>
+);
 
 const ChoiceSelector: React.FC<{
   choice: FeatureChoice;
@@ -165,47 +163,39 @@ const ChoiceSelector: React.FC<{
 
   return (
     <View style={styles.choiceCard}>
-      <Text style={styles.choiceLabel}>{choice.name.toUpperCase()}</Text>
+      <Text style={styles.choiceTitle}>{choice.name}</Text>
 
       {isEditable ? (
-        <View style={styles.pickerContainer}>
-          {options.length > 0 ? (
-            options.map((opt) => {
-              const isSelected = selectedValue === opt.id;
-              return (
-                <TouchableOpacity
-                  key={opt.id}
-                  style={[
-                    styles.optionButton,
-                    isSelected && styles.optionButtonSelected,
-                  ]}
-                  onPress={() => onSelectionChange(choice.id, opt.id)}
-                >
-                  <View>
-                    {isSelected && opt.description ? (
-                      <Text style={styles.optionDescription}>
-                        {opt.description}
-                      </Text>
-                    ) : (
-                      <Text />
-                    )}
-                  </View>
-                </TouchableOpacity>
-              );
-            })
-          ) : (
-            <Text />
-          )}
+        <View style={styles.optionsList}>
+          {options.map((opt) => {
+            const isSelected = selectedValue === opt.id;
+            return (
+              <TouchableOpacity
+                key={opt.id}
+                style={[
+                  styles.optionItem,
+                  isSelected && styles.optionItemSelected,
+                ]}
+                onPress={() => onSelectionChange(choice.id, opt.id)}
+              >
+                <View style={styles.optionHeader}>
+                  <Text style={[styles.optionName, isSelected && styles.optionNameSelected]}>
+                    {opt.name.toUpperCase()}
+                  </Text>
+                  {isSelected && <Text style={styles.checkMark}>✓</Text>}
+                </View>
+                {opt.description && (
+                  <Text style={styles.optionDescription}>{opt.description}</Text>
+                )}
+              </TouchableOpacity>
+            );
+          })}
         </View>
       ) : (
-        <View style={styles.readOnlyChoice}>
-          <Text style={styles.choiceValue}>{selectedLabel}</Text>
-          {selectedDescription ? (
-            <Text style={styles.selectedDescription}>
-              {selectedDescription}
-            </Text>
-          ) : (
-            <Text />
+        <View style={styles.readonlyContainer}>
+          <Text style={styles.selectedValue}>{selectedLabel.toUpperCase()}</Text>
+          {selectedDescription && (
+            <Text style={styles.selectedDescription}>{selectedDescription}</Text>
           )}
         </View>
       )}
@@ -214,14 +204,18 @@ const ChoiceSelector: React.FC<{
 };
 
 const styles = StyleSheet.create({
-  container: {
+  scrollContent: {
     padding: 24,
     gap: 32,
   },
+  emptyContainer: {
+    padding: 32,
+  },
   loadingText: {
     color: "#94a3b8",
-    fontSize: 16,
     textAlign: "center",
+    fontWeight: "900",
+    letterSpacing: 2,
   },
   header: {
     gap: 8,
@@ -237,18 +231,18 @@ const styles = StyleSheet.create({
     color: "#94a3b8",
     lineHeight: 24,
   },
-  statsSection: {
+  statsRow: {
     flexDirection: "row",
-    gap: 12,
     flexWrap: "wrap",
+    gap: 12,
   },
   statBox: {
     flex: 1,
     minWidth: 100,
-    backgroundColor: "rgba(30, 41, 59, 0.5)",
-    borderRadius: 16,
+    backgroundColor: "rgba(15, 23, 42, 0.5)",
+    borderRadius: 20,
     borderWidth: 1,
-    borderColor: "#334155",
+    borderColor: "#1e293b",
     padding: 16,
     alignItems: "center",
   },
@@ -276,13 +270,13 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 11,
     fontWeight: "900",
-    color: "#6366f1",
+    color: "#10b981",
     letterSpacing: 2,
   },
   divider: {
+    flex: 1,
     height: 1,
     backgroundColor: "#1e293b",
-    flex: 1,
   },
   choiceList: {
     gap: 20,
@@ -292,51 +286,60 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 2,
     borderColor: "#1e293b",
-    backgroundColor: "rgba(30, 41, 59, 0.4)",
+    backgroundColor: "rgba(15, 23, 42, 0.4)",
     gap: 12,
   },
-  choiceLabel: {
+  choiceTitle: {
     fontSize: 10,
     fontWeight: "900",
     color: "#64748b",
     letterSpacing: 1.5,
+    textTransform: "uppercase",
   },
-  readOnlyChoice: {
-    gap: 4,
-  },
-  choiceValue: {
-    fontSize: 18,
-    fontWeight: "900",
-    color: "#818cf8",
-  },
-  selectedDescription: {
-    fontSize: 14,
-    color: "#94a3b8",
-    lineHeight: 20,
-    fontStyle: "italic",
-  },
-  pickerContainer: {
+  optionsList: {
     gap: 8,
   },
-  optionButton: {
+  optionItem: {
     padding: 12,
     borderRadius: 12,
     backgroundColor: "#1e293b",
     borderWidth: 1,
     borderColor: "#334155",
-    gap: 4,
   },
-  optionButtonSelected: {
-    backgroundColor: "rgba(99, 102, 241, 0.1)",
-    borderColor: "#4f46e5",
+  optionItemSelected: {
+    backgroundColor: "rgba(16, 185, 129, 0.1)",
+    borderColor: "#10b981",
   },
   optionHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    marginBottom: 4,
+  },
+  optionName: {
+    fontSize: 14,
+    fontWeight: "bold",
+    color: "#94a3b8",
+  },
+  optionNameSelected: {
+    color: "#ffffff",
+  },
+  readonlyContainer: {
+    gap: 4,
+  },
+  selectedValue: {
+    fontSize: 18,
+    fontWeight: "900",
+    color: "#10b981",
+  },
+  selectedDescription: {
+    fontSize: 14,
+    color: "#94a3b8",
+    fontStyle: "italic",
+    lineHeight: 20,
   },
   optionText: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: "700",
     color: "#94a3b8",
   },
@@ -344,7 +347,7 @@ const styles = StyleSheet.create({
     color: "#ffffff",
   },
   checkMark: {
-    color: "#818cf8",
+    color: "#10b981",
     fontWeight: "900",
   },
   optionDescription: {
